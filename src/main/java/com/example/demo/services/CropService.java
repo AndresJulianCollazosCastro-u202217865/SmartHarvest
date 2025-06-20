@@ -29,9 +29,13 @@ public class CropService implements ICropService {
     @Transactional
     @Override
     public CropDto crearCultivo(CropDto dto) {
+        Long userId = dto.getUser().getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         Crop crop = modelMapper.map(dto, Crop.class);
-
+        crop.setUser(user);
         crop = cropRepository.save(crop);
+
         return modelMapper.map(crop, CropDto.class);
     }
 

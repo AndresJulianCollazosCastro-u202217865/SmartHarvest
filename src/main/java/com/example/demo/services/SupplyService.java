@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 
 import com.example.demo.dtos.SupplyDto;
+import com.example.demo.entities.Crop;
 import com.example.demo.entities.Supply;
 import com.example.demo.interfaces.ISupplyService;
 import com.example.demo.repositories.CropRepository;
@@ -30,11 +31,16 @@ public class SupplyService implements ISupplyService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Transactional
     @Override
     public SupplyDto crearInsumo(SupplyDto dto) {
-        Supply supply = modelMapper.map(dto, Supply.class);
-        supply = supplyRepository.save(supply);
-        return modelMapper.map(supply, SupplyDto.class);
+            Supply supply = modelMapper.map(dto, Supply.class);
+            Long cropId = dto.getCrop().getId();
+            Crop crop = cropRepository.findById(cropId)
+                    .orElseThrow(() -> new RuntimeException("Cultivo no encontrado"));
+            supply.setCrop(crop);
+            supply = supplyRepository.save(supply);
+            return modelMapper.map(supply, SupplyDto.class);
     }
 
     @Override
